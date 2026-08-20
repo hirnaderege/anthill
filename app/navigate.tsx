@@ -1,7 +1,7 @@
 import * as Location from "expo-location";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import MapView, { Marker, Polyline } from "react-native-maps";
+import RouteMap from "../components/RouteMap";
 import { useRouteContext } from "../context/RouteContext";
 import { distanceBetween } from "../utils/distance";
 
@@ -92,11 +92,15 @@ export default function NavigateScreen() {
 
     return (
         <View style={{ flex: 1 }}>
-            <MapView style={styles.map} region={region}>
-                <Polyline coordinates={selectedRoute.coordinates} strokeColor="#2E8B57" strokeWidth={4} />
-                <Marker coordinate={currentStep.coordinate} pinColor="blue" title="next turn" />
-                {userLocation && <Marker coordinate={userLocation} pinColor="red" title="you" />}
-            </MapView>
+            <View style={styles.map}>
+                <RouteMap
+                    routes={[{ id: "current", coordinates: selectedRoute.coordinates }]}
+                    selectedID="current"
+                    onSelectedRoute={() => {}}
+                    region={region}
+                    userLocation={userLocation ?? undefined}
+                />
+                </View>
 
             <View style={styles.instructionCard}>
                 <Text style={styles.stepCount}>

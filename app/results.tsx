@@ -1,8 +1,8 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import MapView, { Marker, Polyline } from "react-native-maps";
 import ElevationChart from "../components/elevationChart";
+import RouteMap from "../components/RouteMap";
 import { useRouteContext } from "../context/RouteContext";
 import { getRoutes, Route } from "../services/routing";
 
@@ -103,47 +103,15 @@ export default function resultsScreen() {
     router.push("/navigate");
   }
 
-  {/*
-  function openInNativeMaps(){
-    const start = selected.coordinates[0];
-    const end = selected.coordinates[selected.coordinates.length - 1];
-
-    const appleFlag = mode === "drive" ? "d" : "w";
-    const googleMode = mode === "drive" ? "d" : mode === "bike" ? "b" : "w";
-
-    const url = 
-      Platform.OS === "ios"
-        ? `http://maps.apple.com/?saddr=${start.latitude},${start.longitude}&daddr=${end.latitude},${end.longitude}&dirflg=${appleFlag}`
-        : `google.navigation:q=${end.latitude},${end.longitude}&mode=${googleMode}`;
-    
-        Linking.openURL(url).catch(() => {
-          const fallback = `https://www.google.com/maps/dir/?api=1&origin=${start.latitude},${start.longitude}&destination=${end.latitude},${end.longitude}&travelmode=${mode === "walk" ? "walking" : mode === "bike" ? "bicycling" : "driving"}`;
-          Linking.openURL(fallback);
-        });
-
-  } // end of open 
- */}
-
   return (
-    <View style={{ flex: 1 }}>
-      <MapView style={styles.map} initialRegion={region}>
-        {[...routes]
-          .map((r, i) => ({ route: r, index: i }))
-          .sort((a, b) => (a.index === selectedID ? 1 : b.index === selectedID ? -1 : 0))
-          .map(({ route: r, index: i }) => (
-            <Polyline
-              key={r.id}
-              coordinates={r.coordinates}
-              strokeColor={i === selectedID ? "#2E8B57" : "#bbb"}
-              strokeWidth={i === selectedID ? 5 : 3}
-              tappable
-              onPress={() => setSelectedID(i)}
-            />
-        ))}
-        <Marker coordinate={selected.coordinates[0]} pinColor="green" />
-        <Marker coordinate={selected.coordinates[selected.coordinates.length - 1]} pinColor="red" />
-      </MapView>
 
+    <View style={{ flex: 1 }}>
+      <RouteMap 
+        routes={routes} 
+        selectedID={selected.id} 
+        onSelectedRoute={(id) => setSelectedID(routes.findIndex(r => r.id === id))} 
+        region={region} 
+      />
       <ScrollView style={styles.container}>
         <Text style={styles.title}> {routes.length} routes found ( ⸝⸝´ ᵕ `⸝⸝) </Text>
         
