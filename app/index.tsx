@@ -16,6 +16,7 @@ export default function homeScreen() {
   const [searchError, setSearchError] = useState<string | null>(null);    
   const [suggestions , setSuggestions] = useState<GeoResult[]>([]);
   const [activeField, setActiveField] = useState<"start" | "end" | null>(null);
+  const [userLocation, setUserLocation] = useState<{ latitude: number, longitude: number} | null>(null);
 
   function handleFindRoutes() {
     if(!startPoint || !endPoint)
@@ -52,6 +53,19 @@ export default function homeScreen() {
     setSuggestions([]);
 } // end of useCurrLoc
 
+
+  useEffect(() => {
+    async function getInitalLocation() {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted")
+        return;
+      const loc = await Location.getCurrentPositionAsync({});
+      setUserLocation({ latitude: loc.coords.latitude, longitude: loc.coords.longitude });
+    } // end of getInit
+    getInitalLocation();
+  }, []);
+
+
   useEffect(() => {
     const query = activeField === "start" ? startQ : endQ;
     console.log("effect fired:", { activeField, query });
@@ -65,7 +79,7 @@ export default function homeScreen() {
       console.log("searching for:", query);
       setIsSearching(true);
       setSearchError(null);
-      searchAddress(query)
+      searchAddress(query, userLocation ?? undefined)
         .then((results) => {
           console.log("got results:", results.length);
           setSuggestions(results)
@@ -78,7 +92,7 @@ export default function homeScreen() {
     }, 400);
 
     return () => clearTimeout(timer);
-  }, [startQ, endQ, activeField]);
+  }, [startQ, endQ, activeField, userLocation]);
 
 
   function selectSuggestions(item: GeoResult) {
