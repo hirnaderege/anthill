@@ -1,4 +1,3 @@
-Anthill readme · MD
 # anthill 🐜
  
 > a GPS app that actually cares about hills
